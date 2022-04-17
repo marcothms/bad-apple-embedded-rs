@@ -2,7 +2,10 @@
 
 * Features
 
+* Dependencies
+The video-to-ascii conversion script uses [[https://github.com/ivanl-exe/image-to-ascii/][image-to-ascii]] for the conversion in the background.
+It is assumed to be located on the same height as this project and that it is build in release-mode (due to performance).
+
 * TODO
 - [ ] Add README Stuff
-- [ ] Python script should allow to reduce framerate (drop every X frame)
-- [ ] Add args to python script
+- [ ] Rewrite ascii conversion in Rust (with an own impl of ascii-to-text)

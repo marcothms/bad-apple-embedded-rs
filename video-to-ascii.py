@@ -6,36 +6,64 @@ Using: https://github.com/ivanl-exe/image-to-ascii/
 import cv2
 import os
 import shutil
+import argparse
 
-OUT_DIR = 'assets/output'
-GEN_TXT = 'assets/gen.txt'
-CONVERT = False
+OUTPUT = 'assets/output'
+ASCII_TXT = 'assets/ascii.txt'
 
-video = cv2.VideoCapture(r'/home/marc/5fps.mp4')
+def parse_args():
+    """
+    Parse args and return them
+    """
+    parser = argparse.ArgumentParser(description='Convert a video to a contiguous ascii text file.')
+    parser.add_argument('--video', help='Input Video')
+    parser.add_argument('--width', default='21', help='Width of a single ascii image')
+    parser.add_argument('--height', default='10', help='Height of a single ascii image')
 
-# write all frames to an output dir
-current_frame = 0
-if CONVERT:
+    return parser.parse_args()
+
+def main():
+    """
+    Convert frames to jpgs, convert each to ascii, and append it to the ascii.txt
+    """
+    args = parse_args()
+    current_frame = 0
+
+    if args.video is None:
+        print("Must provide a path to a video!")
+        exit(1)
+    video = cv2.VideoCapture(args.video)
+
     # make sure to delete leftover output
-    shutil.rmtree(OUT_DIR)
-    os.makedirs(OUT_DIR)
+    try:
+        shutil.rmtree(OUTPUT)
+    except FileNotFoundError:
+        pass
+    os.makedirs(OUTPUT)
     while True:
         ret, frame = video.read()
         if ret:
-            name = OUT_DIR + '/frame' + str(current_frame) + '.jpg'
+            name = OUTPUT + '/frame' + str(current_frame) + '.jpg'
             cv2.imwrite(name, frame)
             print(f"Frame to jpg: {current_frame}")
             current_frame += 1
         else:
             break
 
-# convert to ascii
-shutil.rmtree(GEN_TXT)
-for f in os.listdir(OUT_DIR):
-    filename = os.path.abspath(OUT_DIR + '/' + f)
-    print(f'Processing: {filename}')
-    os.system(f'../image-to-ascii/target/release/image_to_ascii 21 10 true {filename} >> {GEN_TXT}')
+    # convert to ascii
+    try:
+        os.remove(ASCII_TXT)
+    except FileNotFoundError:
+        pass
 
-# cleanup
-video.release()
-cv2.destroyAllWindows()
+    for f in os.listdir(OUTPUT):
+        filename = os.path.abspath(OUTPUT + '/' + f)
+        print(f'Processing: {filename}')
+        os.system(f'../image-to-ascii/target/release/image_to_ascii {args.width} {args.height} true {filename} >> {ASCII_TXT}')
+
+    # cleanup
+    video.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
