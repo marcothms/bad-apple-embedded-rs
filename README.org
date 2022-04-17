@@ -1,0 +1,8 @@
+#+TITLE: bad-apple-embedded-rs
+
+* Features
+
+* TODO
+- [ ] Add README Stuff
+- [ ] Python script should allow to reduce framerate (drop every X frame)
+- [ ] Add args to python script
