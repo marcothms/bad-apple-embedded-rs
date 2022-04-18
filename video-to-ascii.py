@@ -1,15 +1,28 @@
 """
-Convert a video to a txt in a format, which i need
+Convert a video to a textfile in a format, which i need:
+
+ASCII_TXT:
+---
+IMAGE
+IMAGE
+IMAGE
+...
+---
+
 Using: https://github.com/ivanl-exe/image-to-ascii/
 """
+
 
 import cv2
 import os
 import shutil
 import argparse
 
+
 OUTPUT = 'assets/output'
 ASCII_TXT = 'assets/ascii.txt'
+TOOL_PATH = '../image-to-ascii/target/release/image_to_ascii'
+
 
 def parse_args():
     """
@@ -21,6 +34,7 @@ def parse_args():
     parser.add_argument('--height', default='10', help='Height of a single ascii image')
 
     return parser.parse_args()
+
 
 def main():
     """
@@ -59,11 +73,21 @@ def main():
     for f in os.listdir(OUTPUT):
         filename = os.path.abspath(OUTPUT + '/' + f)
         print(f'Processing: {filename}')
-        os.system(f'../image-to-ascii/target/release/image_to_ascii {args.width} {args.height} true {filename} >> {ASCII_TXT}')
+        os.system(f'{TOOL_PATH} {args.width} {args.height} true {filename} >> {ASCII_TXT}')
 
     # cleanup
     video.release()
     cv2.destroyAllWindows()
 
+
+def check_deps():
+    """
+    Checks if the deps, used in this script, are present
+    """
+    if not os.path.isfile(TOOL_PATH):
+        print("Missing image-to-ascii at expected location!")
+        exit(1)
+
 if __name__ == '__main__':
+    check_deps()
     main()

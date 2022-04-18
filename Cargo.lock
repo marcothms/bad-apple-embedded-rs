@@ -42,6 +42,7 @@ dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
  "embedded-graphics",
+ "embedded-time",
  "panic-halt",
  "panic-rtt-target",
  "rtt-target 0.2.2",

@@ -1,42 +1,47 @@
 #![no_std]
 #![no_main]
 
-use cortex_m::prelude::*;
+use cortex_m::delay::Delay;
 use cortex_m_rt::entry;
+use embedded_graphics::mono_font::MonoTextStyleBuilder;
 use embedded_graphics::{
     mono_font::ascii::FONT_4X6,
     pixelcolor::BinaryColor,
     prelude::*,
     text::{Baseline, Text},
 };
-use panic_halt as _;
+use embedded_time::fixed_point::FixedPoint as _;
+use hal::{i2c::I2c, timer::MonoTimer};
+use pac::{CorePeripherals, Peripherals};
+use panic_rtt_target as _;
 use rtt_target::{rprintln, rtt_init_print};
 use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306};
-use stm32f3xx_hal::{self as hal, pac, prelude::*};
 use stm32f3xx_hal::prelude::_embedded_hal_digital_InputPin;
+use stm32f3xx_hal::{self as hal, pac, prelude::*};
 
-const IMAGE_LEN: usize = 220; // size of a single ascii image on screen
-const IMAGE_END: usize = 1093 * 220; // position of the last ascii char
+const IMAGE_WIDTH: usize = 21;
+const IMAGE_HEIGHT: usize = 10;
+const TOTAL_FRAMES: usize = 1749;
+const DRAW_TIME: usize = 125; // ms for a single screen draw
+
+const IMAGE_LEN: usize = IMAGE_HEIGHT * (IMAGE_WIDTH + 1); // adjust for newline char
+const IMAGE_END: usize = TOTAL_FRAMES * IMAGE_LEN; // position of the last ascii char
 
 #[entry]
 fn main() -> ! {
     rtt_init_print!();
-    let peripherals = pac::Peripherals::take().unwrap();
-    let mut core_peripherals = pac::CorePeripherals::take().unwrap();
+    let peripherals = Peripherals::take().unwrap();
+    let mut core_peripherals = CorePeripherals::take().unwrap();
 
     let mut rcc = peripherals.RCC.constrain();
     let mut flash = peripherals.FLASH.constrain();
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
     let mut gpiob = peripherals.GPIOB.split(&mut rcc.ahb);
     let mut gpioc = peripherals.GPIOC.split(&mut rcc.ahb);
-    let monotimer = hal::timer::MonoTimer::new(
-        core_peripherals.DWT,
-        clocks,
-        &mut core_peripherals.DCB);
-    // TODO: dont use hardcoded val here
-    let mut delay = cortex_m::delay::Delay::new(core_peripherals.SYST, 8000000);
+    let monotimer = MonoTimer::new(core_peripherals.DWT, clocks, &mut core_peripherals.DCB);
+    let mut delay_provider = Delay::new(core_peripherals.SYST, clocks.hclk().integer());
 
-    let mut button1 = gpioc
+    let button1 = gpioc
         .pc13
         .into_pull_down_input(&mut gpioc.moder, &mut gpioc.pupdr);
 
@@ -47,7 +52,7 @@ fn main() -> ! {
         .pb9
         .into_af_open_drain(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh);
 
-    let i2c = hal::i2c::I2c::new(
+    let i2c = I2c::new(
         peripherals.I2C1,
         (scl, sda),
         1000.kHz().try_into().unwrap(),
@@ -60,40 +65,47 @@ fn main() -> ! {
         .into_buffered_graphics_mode();
     display.init().unwrap();
 
-    let text_style = embedded_graphics::mono_font::MonoTextStyleBuilder::new()
+    let text_style = MonoTextStyleBuilder::new()
         .font(&FONT_4X6)
         .text_color(BinaryColor::On)
         .build();
 
-    let bad_apple = core::str::from_utf8(include_bytes!("../assets/gen.txt")).unwrap();
+    let ascii_txt = core::str::from_utf8(include_bytes!("../assets/ascii.txt")).unwrap();
 
     // start indexing at 0, draw IMAGE_LEN ascii chars to display
     let mut index: usize = 0;
     loop {
-        let instant = monotimer.now();
+        let monotimer_instant = monotimer.now();
+
         display.clear();
 
-        rprintln!("draw: {} to {}", index, index + IMAGE_LEN);
         let text = Text::with_baseline(
-            &bad_apple[index..index + IMAGE_LEN],
+            &ascii_txt[index..index + IMAGE_LEN],
             Point::new(0, 0),
             text_style,
             Baseline::Top,
         );
         text.draw(&mut display).unwrap();
+        // draw out to physical screen
         display.flush().unwrap();
 
         // go to next frame or reset to start
         index = (index + IMAGE_LEN) % IMAGE_END;
 
-        let elapsed = instant.elapsed();
-        rprintln!("draw took: {}", elapsed);
-        rprintln!("freq: {}", monotimer.frequency());
-        delay.delay_ms(100);
+        // adjust for desired framerate
+        // TODO: chip is too fast for some reason
+        let freq = monotimer.frequency().0;
+        // maybe use float calc here?
+        let ms_per_draw = 1000 / (freq / monotimer_instant.elapsed());
+        rprintln!("Draw took {}ms", ms_per_draw);
+        match DRAW_TIME.checked_sub(ms_per_draw as usize) {
+            Some(result) => delay_provider.delay_ms(result as u32),
+            None => (),
+        };
 
-        // kill switch
+        // reset
         if button1.is_high().unwrap() {
-            loop {}
+            index = 0
         }
     }
 }
