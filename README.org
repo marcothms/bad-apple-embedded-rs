@@ -4,17 +4,25 @@
 
 Why? Because I wanted to and because Rust rocks!
 
+* Demo
+#+html: <p align="center"><img src="assets/bad_apple.gif" /></p>
+
+A full demo can be found [[https://www.youtube.com/watch?v=Jn2qinh5Zyo][here]].
+
 * Features
-This project was built using an =STM32-F303ZE= with a simple =ssd1306= OLED display.
-It draws 21x10 with (almost perfectly) stable 8 frames per second and
+This project was built using an =STM32F303ZE= with a simple =ssd1306= OLED display.
+On my chip it can draw 21x10 characters (83x60 pixels) with stable 8 frames per second and
 was designed and built to play Bad Apple, but anything else would also work.
 Frame timings and length of the video can be adjusted, too high frames per second can lead to slowed down playback due to the render time being larger than the desired one.
-Faster render times are being adjusted for.
+Faster render times (lower fps) are being adjusted for.
 
 * How to use
 1. Convert a video to an ASCII file, using =video-to-ascii.py=
 2. Adjust frame timing in the main program (draw time per picture, width, height, total frames)
 3. Flash and enjoy!
+
+Don't forget to adjust the HAL and I2C pins in the code.
+The lastest =ascii.txt= I used is also present in this repository.
 
 * Input format
 The screen renders video through ASCII characters. It takes in a long text file, containing all the images in a contiguous stream, which is then read in =IMAGE_LEN=-sized (height * width + newline chars) chunks in the main program.
@@ -25,5 +33,5 @@ The =video-to-ascii.py= conversion script uses [[https://github.com/ivanl-exe/im
 It is assumed to be located on the same height as this project and that it is build in release-mode (due to performance).
 
 * TODO
-- [X] Fix timing in draw
-- [ ] Rewrite ascii conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)
+- [X] Fix timing in draw (still a tiny bit off, but it's fine)
+- [ ] Rewrite ASCII conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)

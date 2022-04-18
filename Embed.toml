@@ -5,7 +5,7 @@ chip = "STM32F303ZETx"
 halt_afterwards = false
 
 [default.rtt]
-enabled = true
+enabled = false
 
 [default.gdb]
 enabled = false

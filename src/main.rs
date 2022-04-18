@@ -14,7 +14,7 @@ use embedded_time::fixed_point::FixedPoint as _;
 use hal::{i2c::I2c, timer::MonoTimer};
 use pac::{CorePeripherals, Peripherals};
 use panic_rtt_target as _;
-use rtt_target::{rprintln, rtt_init_print};
+use rtt_target::rtt_init_print;
 use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306};
 use stm32f3xx_hal::prelude::_embedded_hal_digital_InputPin;
 use stm32f3xx_hal::{self as hal, pac, prelude::*};
@@ -101,6 +101,7 @@ fn main() -> ! {
         // WARNING: don't do anything after elapsed() has been calculated,
         // otherwise it will delay the frame being drawn, which will
         // knock it off sync
+        // It's still a tiny, wheensy bit off, but it's fine
         let freq: f64 = monotimer.frequency().0.into();
         let ms_per_draw: f64 = f64::from(1000 ) / (freq / f64::from(monotimer_instant.elapsed()));
         match DRAW_TIME.checked_sub(ms_per_draw as usize) {
