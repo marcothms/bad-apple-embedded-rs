@@ -25,5 +25,5 @@ The =video-to-ascii.py= conversion script uses [[https://github.com/ivanl-exe/im
 It is assumed to be located on the same height as this project and that it is build in release-mode (due to performance).
 
 * TODO
-- [ ] Fix timing in draw
+- [X] Fix timing in draw
 - [ ] Rewrite ascii conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)

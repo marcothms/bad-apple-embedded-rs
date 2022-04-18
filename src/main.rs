@@ -77,6 +77,11 @@ fn main() -> ! {
     loop {
         let monotimer_instant = monotimer.now();
 
+        // reset
+        if button1.is_high().unwrap() {
+            index = 0
+        }
+
         display.clear();
 
         let text = Text::with_baseline(
@@ -93,19 +98,14 @@ fn main() -> ! {
         index = (index + IMAGE_LEN) % IMAGE_END;
 
         // adjust for desired framerate
-        // TODO: chip is too fast for some reason
-        let freq = monotimer.frequency().0;
-        // maybe use float calc here?
-        let ms_per_draw = 1000 / (freq / monotimer_instant.elapsed());
-        rprintln!("Draw took {}ms", ms_per_draw);
+        // WARNING: don't do anything after elapsed() has been calculated,
+        // otherwise it will delay the frame being drawn, which will
+        // knock it off sync
+        let freq: f64 = monotimer.frequency().0.into();
+        let ms_per_draw: f64 = f64::from(1000 ) / (freq / f64::from(monotimer_instant.elapsed()));
         match DRAW_TIME.checked_sub(ms_per_draw as usize) {
             Some(result) => delay_provider.delay_ms(result as u32),
             None => (),
         };
-
-        // reset
-        if button1.is_high().unwrap() {
-            index = 0
-        }
     }
 }
