@@ -1,11 +1,11 @@
 #+TITLE: bad-apple-embedded-rs
 
-#+html: <p align="center" width="300"><img src="assets/bad_apple.jpg" /></p>
+[[assets/bad_apple.jpg]]
 
 Why? Because I wanted to and because Rust rocks!
 
 * Demo
-#+html: <p align="center"><img src="assets/bad_apple.gif" /></p>
+[[assets/bad_apple.gif]]
 
 A full demo can be found [[https://www.youtube.com/watch?v=Jn2qinh5Zyo][here]].
 
