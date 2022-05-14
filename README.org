@@ -17,7 +17,7 @@ Frame timings and length of the video can be adjusted, too high frames per secon
 Faster render times (lower fps) are being adjusted for.
 
 * How to use
-1. Convert a video to an ASCII file, using =video-to-ascii.py=
+1. Convert a video to an ASCII file, using =video-to-asciiy=
 2. Adjust frame timing in the main program (draw time per picture, width, height, total frames)
 3. Flash and enjoy!
 
@@ -29,11 +29,9 @@ The screen renders video through ASCII characters. It takes in a long text file,
 If these parameters don't match up, the end result won't either.
 
 * Dependencies
-The =video-to-ascii.py= conversion script uses [[https://github.com/ivanl-exe/image-to-ascii/][image-to-ascii]] for the conversion in the background.
-It is assumed to be located on the same height as this project and that it is build in release-mode (due to performance).
-
 =video-to-ascii= needs ffmpeg-libraries, which (on rpm-based distros) can be installed via =dnf install ffmpeg-devel=.
 
 * TODO
 - [X] Fix timing in draw (still a tiny bit off, but it's fine)
-- [ ] Rewrite ASCII conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)
+- [X] Rewrite ASCII conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)
+- [ ] Optimize =video-to-ascii= conversion speed

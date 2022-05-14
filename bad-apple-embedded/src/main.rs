@@ -98,7 +98,7 @@ fn main() -> ! {
         index = (index + IMAGE_LEN) % IMAGE_END;
 
         // adjust for desired framerate
-        // WARNING: don't do anything after elapsed() has been calculated,
+        // WARNING: don't do anything after ms_per_draw has been calculated,
         // otherwise it will delay the frame being drawn, which will
         // knock it off sync
         // It's still a tiny, wheensy bit off, but it's fine
