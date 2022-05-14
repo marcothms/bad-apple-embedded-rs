@@ -32,6 +32,8 @@ If these parameters don't match up, the end result won't either.
 The =video-to-ascii.py= conversion script uses [[https://github.com/ivanl-exe/image-to-ascii/][image-to-ascii]] for the conversion in the background.
 It is assumed to be located on the same height as this project and that it is build in release-mode (due to performance).
 
+=video-to-ascii= needs ffmpeg-libraries, which (on rpm-based distros) can be installed via =dnf install ffmpeg-devel=.
+
 * TODO
 - [X] Fix timing in draw (still a tiny bit off, but it's fine)
 - [ ] Rewrite ASCII conversion in Rust or Haskell (with an own implementation of =ascii-to-text=)

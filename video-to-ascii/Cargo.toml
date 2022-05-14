@@ -1,0 +1,12 @@
+[package]
+name = "video-to-ascii"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+asciify = "0.1.6"
+clap = { version = "3.1.10", features = ["derive"] }
+ffmpeg-next = "5.0.3"
+image = "0.23.8"

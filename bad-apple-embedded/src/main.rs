@@ -70,7 +70,7 @@ fn main() -> ! {
         .text_color(BinaryColor::On)
         .build();
 
-    let ascii_txt = core::str::from_utf8(include_bytes!("../assets/ascii.txt")).unwrap();
+    let ascii_txt = core::str::from_utf8(include_bytes!("../../assets/ascii.txt")).unwrap();
 
     // start indexing at 0, draw IMAGE_LEN ascii chars to display
     let mut index: usize = 0;
